@@ -1,0 +1,49 @@
+<?php
+
+namespace Drupal\custom_api\Plugin\CustomApi\{{ entity_type_ucfirst }};
+
+{% if use_helper %}
+use Drupal\custom_api\Plugin\CustomApi\ApiFieldHelperTrait;
+{% endif %}
+
+/**
+ * Plugin implementation of the custom_api.
+ *
+ * @CustomgApi(
+ *   id = "{{entity_type}}_{{ bundle }}",
+ *   title = @Translation("{{ entity_type_ucfirst }} {{ bundle }}"),
+ *   bundle = "{{ bundle }}",
+ *   custom_bundle = "{{ bundle }}",
+ *   entity_id = {},
+ *   langcode = {},
+ *   referenced_plugins = {},
+ *   is_stub = {},
+ * )
+ */
+class {{ bundle_camelize }} extends CustomApi{{ entity_type_ucfirst }}Base {
+
+{% if use_helper %}
+  use ApiFieldHelperTrait;
+{% endif %}
+{% if not bundle_exists %}
+  // Not able to find a bundle with of this entity type. Please create one.
+{% endif %}
+
+  /**
+   * {@inheritDoc}
+   */
+  public function setCustomData($entity) {
+    return [
+    {% if entity_fields %}
+    // Notes:
+    // - Fields below are just a starting point, refine these down to the fields you actually want.
+    // - The ->value function won't work for all fields and is just there to kickstart the process.
+    // - Make sure to manually updated the "referenced_plugins" value in the annotation.
+    {% for entity_field in entity_fields %}
+      '{{ entity_field }}' => $entity->get('{{ entity_field }}')->value,
+    {% endfor %}
+    {% endif %}
+    ];
+  }
+
+}
